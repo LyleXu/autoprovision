@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "springCloudInstanceName": {
+            "value": "ascmyworspacesdev"
+        },
+        "appInsightsName": {
+            "value": "ascinsightsdev"
+        },
+        "springCloudServiceCidrs": {
+            "value": "10.0.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        }
+    }
+}
