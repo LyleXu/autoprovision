@@ -26,13 +26,13 @@
                 "subnet1Prefix": {
                     "value": "10.0.0.0/24"
                 },
-                "subnet1Name": {
+                "runtimeSubnetName": {
                     "value": "Subnet1"
                 },
                 "subnet2Prefix": {
                     "value": "10.0.1.0/24"
                 },
-                "subnet2Name": {
+                "appSubnetName": {
                     "value": "Subnet2"
                 }
             }
@@ -59,6 +59,37 @@
                 },
                 "heartbeatTableRetention": {
                     "value": 30
+                }
+            }
+        }
+    },
+    { // azure spring cloud
+        "name": "azureSpringCloud",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2021-04-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "relativePath": "artifacts/azureSpringCloud.json"
+            },
+            "parameters": {
+                "springCloudInstanceName": {
+                    "value": "ascmyworspacesdev"
+                },
+                "appInsightsName": {
+                    "value": "ascinsightsdev"
+                },
+                "springCloudServiceCidrs": {
+                    "value": "10.0.0.0/16,10.2.0.0/16,10.3.0.1/16"
+                },
+                "laWorkspaceResourceId": {
+                    "value": "[reference('logAnalytics').outputs.laWorkspaceId.value]"
+                },
+                "springCloudAppSubnetID": {
+                    "value": "[reference('vnet').outputs.appSubnetId.value]"
+                },
+                "springCloudRuntimeSubnetID": {
+                    "value": "[reference('vnet').outputs.runtimeSubnetId.value]"
                 }
             }
         }

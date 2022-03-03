@@ -10,6 +10,15 @@
         },
         "springCloudServiceCidrs": {
             "value": "10.0.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        },
+        "laWorkspaceResourceId": {
+            "value": "/subscriptions/{your subscription id}/resourceGroups/rg-test-arm/providers/Microsoft.Network/virtualNetworks/azure-spring-cloud-vnet/subnets/defaultworkspace-50144203-25d7-4aa0-8c7b-3e0d936b07f0-cus"
+        },
+        "springCloudAppSubnetID": {
+            "value": "/subscriptions/{your subscription id}/resourceGroups/rg-test-arm/providers/Microsoft.Network/virtualNetworks/azure-spring-cloud-vnet/subnets/appsubnet"
+        },
+        "springCloudRuntimeSubnetID": {
+           "value": "/subscriptions/{your subscription id}/resourceGroups/rg-test-arm/providers/Microsoft.Network/virtualNetworks/azure-spring-cloud-vnet/subnets/default"
         }
     }
 }

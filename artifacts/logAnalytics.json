@@ -72,5 +72,11 @@
             }
           ]
       }
-  ]
+      ],
+      "outputs": {
+        "laWorkspaceId":{
+          "type": "String",
+          "value": "[concat(resourceId('microsoft.operationalinsights', parameters('workspaceName')), '/workspaces/', parameters('workspaceName'))]"
+        }
+      }
 }
