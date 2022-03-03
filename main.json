@@ -21,16 +21,16 @@
                     "value": "VNet1"
                 },
                 "vnetAddressPrefix": {
-                    "value": "172.19.0.0/16"
+                    "value": "173.19.0.0/16"
                 },
                 "subnet1Prefix": {
-                    "value": "172.19.0.0/24"
+                    "value": "173.19.0.0/24"
                 },
                 "runtimeSubnetName": {
                     "value": "Subnet1"
                 },
                 "subnet2Prefix": {
-                    "value": "172.19.1.0/24"
+                    "value": "173.19.1.0/24"
                 },
                 "appSubnetName": {
                     "value": "Subnet2"
@@ -80,7 +80,7 @@
                     "value": "ascinsightsdev"
                 },
                 "springCloudServiceCidrs": {
-                    "value": "172.25.0.0/16,172.26.0.0/16,172.27.0.0/16"
+                    "value": "173.19.0.0/16,173.20.0.0/16,173.21.0.0/16"
                 },
                 "laWorkspaceResourceId": {
                     "value": "[reference('logAnalytics').outputs.laWorkspaceId.value]"
