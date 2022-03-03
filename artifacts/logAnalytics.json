@@ -76,7 +76,7 @@
       "outputs": {
         "laWorkspaceId":{
           "type": "String",
-          "value": "[concat(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), '/workspaces/', parameters('workspaceName'))]"
+          "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
         }
       }
 }
