@@ -80,7 +80,7 @@
                     "value": "ascinsightsdev"
                 },
                 "springCloudServiceCidrs": {
-                    "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.0/16"
+                    "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.1/16"
                 },
                 "laWorkspaceResourceId": {
                     "value": "[reference('logAnalytics').outputs.laWorkspaceId.value]"
