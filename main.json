@@ -93,6 +93,28 @@
                 }
             }
         }
+    },
+    { // mysql
+        "name": "mysql",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2021-04-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+                "relativePath": "artifacts/database.json"
+            },
+            "parameters": {
+                "serverName": {
+                    "value": "dbmysqldev001"
+                },
+                "administratorLogin": {
+                    "value": "testascdev"
+                },
+                "administratorLoginPassword": {
+                    "value": "Welcome1"
+                }
+            }
+        }
     }
 
     ]
