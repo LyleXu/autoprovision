@@ -9,7 +9,12 @@
             "value": "testascdev"
           },
           "administratorLoginPassword": {
-            "value": "Welcome1"
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/<SubscriptionID>/resourceGroups/<resource group>/providers/Microsoft.KeyVault/vaults/<KeyVaultName>"
+                },
+                "secretName": "PETCLINIC-MYSQL-PASSWORD-DEV"
+            }
         }
     }
   }
