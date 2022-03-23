@@ -176,8 +176,8 @@
         "properties": {
             "networkProfile": {
                 "serviceCidr": "[parameters('springCloudServiceCidrs')]",
-                "serviceRuntimeSubnetId": "[concat('/subscriptions/', subscription().id, '/resourceGroups/', parameters('vnetResourceGroupName') ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/subnets/', parameters('runtimeSubnetName'))]",
-                "appSubnetId": "[concat('/subscriptions/', subscription().id, '/resourceGroups/', parameters('vnetResourceGroupName') ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/subnets/', parameters('appSubnetName'))]"
+                "serviceRuntimeSubnetId": "[concat(resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks', parameters('vnetName') ,'/subnets/', parameters('runtimeSubnetName')))]",
+                "appSubnetId": "[concat(resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks', parameters('vnetName') ,'/subnets/', parameters('appSubnetName')))]"
             }
         }
     },
