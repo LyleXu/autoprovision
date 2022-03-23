@@ -2,12 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "runtimeSubnetId": {
-            "value": "<runtime subnet id>"
+        "vnetName":{
+            "value": "VNet1"
         },
-
-        "appSubnetId": {
-            "value": "<app subnet id"
+        "vnetResourceGroupName":{
+            "value": "rg-testasc-dev"
+        },
+        "runtimeSubnet": {
+            "value": "Subnet1"
+        },
+        "appSubnet": {
+            "value": "Subnet2"
         },
         "workspaceName": {
             "value": "laMyWorkspace1"

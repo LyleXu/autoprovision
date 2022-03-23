@@ -11,15 +11,30 @@
         "appInsightsApiVersion": "2020-02-02-preview"
     },
     "parameters": {
+         
+        "vnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the subnet for spring cloud runtime"
+            }
+        },   
 
-        "runtimeSubnetId": {
+        "vnetResourceGroupName": {
+            "type": "string",
+            "defaultValue": "[resourceGroup()]",
+            "metadata": {
+                "description": "Name of the subnet for spring cloud runtime"
+            }
+        },
+
+        "runtimeSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "Name of the subnet for spring cloud runtime"
             }
         },
 
-        "appSubnetId": {
+        "appSubnetName": {
             "type": "string",
             "metadata": {
                 "description": "Name of the subnet for spring cloud app"
@@ -162,8 +177,8 @@
         "properties": {
             "networkProfile": {
                 "serviceCidr": "[parameters('springCloudServiceCidrs')]",
-                "serviceRuntimeSubnetId": "[parameters('runtimeSubnetId')]",
-                "appSubnetId": "[parameters('appSubnetId')]"
+                "serviceRuntimeSubnetId": "[concat('/subscriptions/', subscription(), '/resourceGroups/', parameters('vnetResourceGroupName') ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/subnets/', parameters('runtimeSubnetName'))]",
+                "appSubnetId": "[concat('/subscriptions/', subscription(), '/resourceGroups/', parameters('vnetResourceGroupName') ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/subnets/', parameters('appSubnetName'))]"
             }
         }
     },
