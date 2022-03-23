@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetName": {
@@ -21,7 +21,7 @@
             "value": "Subnet2"
         },
         "workspaceName": {
-            "value": "laMyWorkspace10"
+            "value": "laMyWorkspace1"
         },
         "workspaceSku": {
             "value": "pergb2018"
@@ -33,7 +33,7 @@
         "value": 30
         },
         "springCloudInstanceName": {
-            "value": "ascmyworspacesdev1"
+            "value": "ascpetclinicdev1"
         },
         "appInsightsName": {
             "value": "ascinsightsdev1"
