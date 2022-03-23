@@ -152,8 +152,7 @@
         "location": "[variables('location')]",
         "tags": "[parameters('tags')]",
         "dependsOn": [
-            "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
-            "[concat('/subscriptions/', subscription().subscriptionId ,'/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/providers/Microsoft.Authorization/roleAssignments/', variables('roleAssignmentName'))]"
+            "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
         ],
         "type": "Microsoft.AppPlatform/Spring",
         "sku": {
