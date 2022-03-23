@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "VNet1"
+        },
+        "vnetAddressPrefix": {
+            "value": "10.0.0.0/16"
+        },
+        "subnet1Prefix": {
+            "value": "10.0.0.0/24"
+        },
+        "runtimeSubnetName": {
+            "value": "Subnet1"
+        },
+        "subnet2Prefix": {
+            "value": "10.0.1.0/24"
+        },
+        "appSubnetName": {
+            "value": "Subnet2"
+        },
+        "workspaceName": {
+            "value": "laMyWorkspace10"
+        },
+        "workspaceSku": {
+            "value": "pergb2018"
+        },
+        "resourcePermissions": {
+            "value": true
+        },
+        "heartbeatTableRetention": {
+        "value": 30
+        },
+        "springCloudInstanceName": {
+            "value": "ascmyworspacesdev1"
+        },
+        "appInsightsName": {
+            "value": "ascinsightsdev1"
+        },
+        "springCloudServiceCidrs": {
+            "value": "10.0.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        }
+    }
+}
