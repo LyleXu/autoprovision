@@ -21,7 +21,6 @@
 
         "vnetResourceGroupName": {
             "type": "string",
-            "defaultValue": "[resourceGroup()]",
             "metadata": {
                 "description": "Name of the subnet for spring cloud runtime"
             }
