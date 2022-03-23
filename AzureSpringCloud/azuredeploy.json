@@ -3,7 +3,6 @@
     "contentVersion": "1.0.0.0",
 
     "variables": {
-        "roleAssignmentName": "[guid(concat('ab2',resourceGroup().id))]",
         "springCloudSkuName": "S0",
         "springCloudSkuTier": "Standard",        
         "location": "[resourceGroup().location]",
@@ -12,43 +11,21 @@
         "appInsightsApiVersion": "2020-02-02-preview"
     },
     "parameters": {
-        // vnet parameters
-        "vnetName": {
+
+        "runtimeSubnetId": {
             "type": "string",
             "metadata": {
-                "description": "VNet name"
+                "description": "Name of the subnet for spring cloud runtime"
             }
         },
-        "vnetAddressPrefix": {
+
+        "appSubnetId": {
             "type": "string",
             "metadata": {
-                "description": "Address prefix"
-        }
-        },
-        "subnet1Prefix": {
-            "type": "string",
-            "metadata": {
-                "description": "Subnet 1 Prefix"
+                "description": "Name of the subnet for spring cloud app"
             }
         },
-        "runtimeSubnetName": {
-            "type": "string",
-            "metadata": {
-                "description": "Subnet 1 Name"
-            }
-        },
-        "subnet2Prefix": {
-            "type": "string",
-            "metadata": {
-                "description": "Subnet 2 Prefix"
-            }
-        },
-        "appSubnetName": {
-            "type": "string",
-            "metadata": {
-                "description": "Subnet 2 Name"
-            }
-        },
+
         // workspace parameters
         "workspaceName": {
           "type": "string",
@@ -124,46 +101,6 @@
 
     "resources": [
     {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2020-06-01",
-      "name": "[parameters('vnetName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('vnetAddressPrefix')]"
-          ]
-        },
-        "subnets": [
-          {
-            "name": "[parameters('runtimeSubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnet1Prefix')]"
-            }
-          },
-          {
-            "name": "[parameters('appSubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnet2Prefix')]"
-            }
-          }
-        ]
-      }
-    },
-    {  // role assignment for vnet to azure spring cloud resource provider
-        "name": "[variables('roleAssignmentName')]",
-        "type": "Microsoft.Authorization/roleAssignments",
-        "apiVersion": "2020-10-01-preview",
-        "scope": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-        "dependsOn": [
-            "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
-        ],
-        "properties": {   
-            "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId ,'/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
-            "principalId": "d2531223-68f9-459e-b225-5592f90d145e"
-        }
-    },
-    {
         // workspace
         "type": "Microsoft.OperationalInsights/workspaces",
         "name": "[parameters('workspaceName')]",
@@ -215,7 +152,6 @@
         "location": "[variables('location')]",
         "tags": "[parameters('tags')]",
         "dependsOn": [
-            "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
             "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
             "[concat('/subscriptions/', subscription().subscriptionId ,'/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/providers/Microsoft.Authorization/roleAssignments/', variables('roleAssignmentName'))]"
         ],
@@ -227,8 +163,8 @@
         "properties": {
             "networkProfile": {
                 "serviceCidr": "[parameters('springCloudServiceCidrs')]",
-                "serviceRuntimeSubnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('runtimeSubnetName'))]",
-                "appSubnetId": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('appSubnetName'))]"
+                "serviceRuntimeSubnetId": "[parameters('runtimeSubnetId')]",
+                "appSubnetId": "[parameters('appSubnetId')]"
             }
         }
     },
