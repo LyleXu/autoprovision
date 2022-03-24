@@ -4,20 +4,35 @@
 
     "variables": {
         "springCloudSkuName": "S0",
-        "springCloudSkuTier": "Standard",        
+        "springCloudSkuTier": "Standard",
         "location": "[resourceGroup().location]",
         "diagApiVersion": "2017-05-01-preview",
         "springApiVersion": "2020-07-01",
-        "appInsightsApiVersion": "2020-02-02-preview"
+        "appInsightsApiVersion": "2020-02-02-preview",
+        "firewallrules": [
+            {
+                "Name": "rule1",
+                "StartIpAddress": "0.0.0.0",
+                "EndIpAddress": "255.255.255.255"
+            },
+            {
+                "Name": "rule2",
+                "StartIpAddress": "0.0.0.0",
+                "EndIpAddress": "255.255.255.255"
+            }
+        ],
+        "defaultSASKeyName": "RootManageSharedAccessKey",
+        "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespaceName'), variables('defaultSASKeyName'))]",
+        "sbVersion": "2017-04-01"
     },
     "parameters": {
-         
+
         "vnetName": {
             "type": "string",
             "metadata": {
                 "description": "Name of the subnet for spring cloud runtime"
             }
-        },   
+        },
 
         "vnetResourceGroupName": {
             "type": "string",
@@ -42,44 +57,44 @@
 
         // workspace parameters
         "workspaceName": {
-          "type": "string",
-          "metadata": {
-            "description": "Name of the workspace."
-          }
+            "type": "string",
+            "metadata": {
+                "description": "Name of the workspace."
+            }
         },
         "workspaceSku": {
-          "type": "string",
-          "allowedValues": [
-            "pergb2018",
-            "Free",
-            "Standalone",
-            "PerNode",
-            "Standard",
-            "Premium"
+            "type": "string",
+            "allowedValues": [
+                "pergb2018",
+                "Free",
+                "Standalone",
+                "PerNode",
+                "Standard",
+                "Premium"
             ],
-          "defaultValue": "pergb2018",
-          "metadata": {
-          "description": "Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
-          }
+            "defaultValue": "pergb2018",
+            "metadata": {
+                "description": "Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
+            }
         },
         "retentionInDays": {
-          "type": "int",
-          "defaultValue": 120,
-          "metadata": {
-            "description": "Number of days to retain data."
-          }
+            "type": "int",
+            "defaultValue": 120,
+            "metadata": {
+                "description": "Number of days to retain data."
+            }
         },
         "resourcePermissions": {
-          "type": "bool",
-          "metadata": {
-            "description": "true to use resource or workspace permissions. false to require workspace permissions."
-          }
+            "type": "bool",
+            "metadata": {
+                "description": "true to use resource or workspace permissions. false to require workspace permissions."
+            }
         },
         "heartbeatTableRetention": {
-          "type": "int",
-          "metadata": {
-            "description": "Number of days to retain data in Heartbeat table."
-          }
+            "type": "int",
+            "metadata": {
+                "description": "Number of days to retain data in Heartbeat table."
+            }
         },
         "springCloudInstanceName": {
             "type": "string",
@@ -99,9 +114,9 @@
             "metadata": {
                 "description": "Comma-separated list of IP address ranges in CIDR format. The IP ranges are reserved to host underlying Azure Spring Cloud infrastructure, which should be 3 at least /16 unused IP ranges, must not overlap with any Subnet IP ranges"
             }
-            
+
         },
-        
+
         "tags": {
             "type": "object",
             "metadata": {
@@ -110,233 +125,734 @@
             "defaultValue": {
                 "environment": "lab"
             }
+        },
+
+        // pg server
+        "dbServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Server Name for Azure database for PostgreSQL"
+            }
+        },
+        "administratorLogin": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "Database administrator login name"
+            }
+        },
+        "administratorLoginPassword": {
+            "type": "secureString",
+            "minLength": 8,
+            "metadata": {
+                "description": "Database administrator password"
+            }
+        },
+        "skuCapacity": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "description": "Azure database for PostgreSQL compute capacity in vCores (2,4,8,16,32)"
+            }
+        },
+        "skuName": {
+            "type": "string",
+            "defaultValue": "GP_Gen5_2",
+            "metadata": {
+                "description": "Azure database for PostgreSQL sku name "
+            }
+        },
+        "skuSizeMB": {
+            "type": "int",
+            "defaultValue": 51200,
+            "metadata": {
+                "description": "Azure database for PostgreSQL Sku Size "
+            }
+        },
+        "skuTier": {
+            "type": "string",
+            "defaultValue": "GeneralPurpose",
+            "allowedValues": [
+                "Basic",
+                "GeneralPurpose",
+                "MemoryOptimized"
+            ],
+            "metadata": {
+                "description": "Azure database for PostgreSQL pricing tier"
+            }
+        },
+        "skuFamily": {
+            "type": "string",
+            "defaultValue": "Gen5",
+            "metadata": {
+                "description": "Azure database for PostgreSQL sku family"
+            }
+        },
+        "postgresqlVersion": {
+            "type": "string",
+            "defaultValue": "11",
+            "allowedValues": [
+                "9.5",
+                "9.6",
+                "10",
+                "10.0",
+                "10.2",
+                "11"
+            ],
+            "metadata": {
+                "description": "PostgreSQL version"
+            }
+        },
+        "backupRetentionDays": {
+            "type": "int",
+            "defaultValue": 7,
+            "metadata": {
+                "description": "PostgreSQL Server backup retention days"
+            }
+        },
+        "geoRedundantBackup": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "Geo-Redundant Backup setting"
+            }
+        },
+        "dbVnetName": {
+            "type": "string",
+            "defaultValue": "azure_postgresql_vnet",
+            "metadata": {
+                "description": "Virtual Network Name"
+            }
+        },
+        "dbSubnetName": {
+            "type": "string",
+            "defaultValue": "azure_postgresql_subnet",
+            "metadata": {
+                "description": "Subnet Name"
+            }
+        },
+        "dbVnetRuleName": {
+            "type": "string",
+            "defaultValue": "AllowSubnet",
+            "metadata": {
+                "description": "Virtual Network RuleName"
+            }
+        },
+        "dbVnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Virtual Network Address Prefix"
+            }
+        },
+        "dbSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Subnet Address Prefix"
+            }
+        },
+        "keyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Key vault name"
+            }
+        },
+        "keyVaultResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Key vault resource gorup name"
+            }
+        },
+        "dbServerSecretName": {
+            "type": "string",
+            "metadata": {
+                "description": "secret name for the db server name value "
+            }
+        },
+        "administratorLoginSecretName": {
+            "type": "string",
+            "metadata": {
+                "description": "secret name for the db server login"
+            }
+        },
+        "administratorLoginPasswordSecretName": {
+            "type": "string",
+            "metadata": {
+                "description": "secret name for the db server login password"
+            }
+        },
+
+        // servcie bus
+        "serviceBusNamespaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Service Bus namespace"
+            }
+        },
+        "serviceBusQueueName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Queue"
+            }
+        },
+        "serviceBusNamespaceConnectionSecretName": {
+            "type": "string",
+            "metadata": {
+                "description": "secret name for service bus connection string"
+            }
+        },
+        "serviceBusNamespacePrimaryKeySecretName": {
+            "type": "string",
+            "metadata": {
+                "description": "secret name for service bus primary key"
+            }
+        },
+        // APIM
+        "apiManagementServiceName": {
+            "type": "string",
+            "metadata": {
+                "description": "APIM servic ename"
+            }
+        },
+        "apimSku": {
+            "type": "string",
+            "defaultValue": "Developer",
+            "allowedValues": [
+                "Developer",
+                "Standard",
+                "Premium"
+            ],
+            "metadata": {
+                "description": "The pricing tier of this API Management service"
+            }
+        },
+        "apimSkuCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "allowedValues": [
+                1,
+                2
+            ],
+            "metadata": {
+                "description": "The instance size of this API Management service."
+            }
+        },
+        "publisherEmail": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The email address of the owner of the service"
+            }
+        },
+        "publisherName": {
+            "type": "string",
+            "minLength": 1,
+            "metadata": {
+                "description": "The name of the owner of the service"
+            }
+        },
+        // aks
+        "clusterName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "osDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 0,
+            "maxValue": 1023,
+            "minValue": 0,
+            "metadata": {
+                "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+            }
+        },
+        "agentCount": {
+            "type": "int",
+            "defaultValue": 3,
+            "maxValue": 50,
+            "minValue": 1,
+            "metadata": {
+                "description": "The number of nodes for the cluster."
+            }
+        },
+        "agentVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2s_v3",
+            "metadata": {
+                "description": "The size of the Virtual Machine."
+            }
+        },
+        "linuxAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
         }
     },
 
     "resources": [
-    {
-        // workspace
-        "type": "Microsoft.OperationalInsights/workspaces",
-        "name": "[parameters('workspaceName')]",
-        "apiVersion": "2020-08-01",
-        "location": "[variables('location')]",
-        "properties": {
-            "sku": {
-                "name": "[parameters('workspaceSku')]"
-            },
-            "retentionInDays": "[parameters('retentionInDays')]",
-            "features": {
-                "enableLogAccessUsingOnlyResourcePermissions": "[parameters('resourcePermissions')]"
-            }
-        },
-        "resources": [
         {
-            "type": "Microsoft.OperationalInsights/workspaces/tables",
+            // workspace
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "[parameters('workspaceName')]",
             "apiVersion": "2020-08-01",
-            "name": "[concat(parameters('workspaceName'),'/','Heartbeat')]",
-            "dependsOn": [
-                "[parameters('workspaceName')]"
-            ],
+            "location": "[variables('location')]",
             "properties": {
-                "RetentionInDays": "[parameters('heartbeatTableRetention')]"
-            }
-        }
-        ]
-    },    
-    {  // Spring Cloud - application insights
-        "type": "Microsoft.Insights/components",
-        "name": "[parameters('appInsightsName')]",
-        "apiVersion": "[variables('appInsightsApiVersion')]",
-        "location": "[variables('location')]",
-        "tags": "[parameters('tags')]",
-        "dependsOn": [
-            "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]"
-        ],
-        "properties": {
-            "Application_Type": "web",
-            "ApplicationId": "[parameters('appInsightsName')]",
-            "Flow_Type": "Bluefield",
-            "Request_Source": "rest",
-            "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]"
-        }
-    },
-    {  // Spring Cloud
-        "apiVersion": "[variables('springApiVersion')]",
-        "name": "[parameters('springCloudInstanceName')]",
-        "location": "[variables('location')]",
-        "tags": "[parameters('tags')]",
-        "dependsOn": [
-            "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
-        ],
-        "type": "Microsoft.AppPlatform/Spring",
-        "sku": {
-            "name": "[variables('springCloudSkuName')]",
-            "tier": "[variables('springCloudSkuTier')]"
-        },
-        "properties": {
-            "networkProfile": {
-                "serviceCidr": "[parameters('springCloudServiceCidrs')]",
-                "serviceRuntimeSubnetId": "[resourceId(parameters('vnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('runtimeSubnetName'))]",
-                "appSubnetId": "[resourceId(parameters('vnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('appSubnetName'))]"
-            }
-        }
-    },
-    {  // Spring Cloud - monitoring setting
-        "apiVersion": "[variables('springApiVersion')]",
-        "name": "[concat(parameters('springCloudInstanceName'), '/default')]",
-        "type": "Microsoft.AppPlatform/Spring/monitoringSettings",
-        "properties": {
-            "traceEnabled": true,
-            "appInsightsInstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]"
-        },
-        "dependsOn": [
-            "[resourceId('Microsoft.AppPlatform/Spring/', parameters('springCloudInstanceName'))]"
-        ]
-    },
-    {
-        "type": "Microsoft.AppPlatform/Spring/providers/diagnosticSettings",
-        "name": "[concat(parameters('springCloudInstanceName'), '/Microsoft.Insights/monitoring')]",
-        "dependsOn": [  
-            "[resourceId('Microsoft.AppPlatform/Spring/', parameters('springCloudInstanceName'))]"       
-        ],
-        "apiVersion": "[variables('diagApiVersion')]",
-        "properties": {
-            "name": "monitoring",
-            "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]",
-            "logs": [
+                "sku": {
+                    "name": "[parameters('workspaceSku')]"
+                },
+                "retentionInDays": "[parameters('retentionInDays')]",
+                "features": {
+                    "enableLogAccessUsingOnlyResourcePermissions": "[parameters('resourcePermissions')]"
+                }
+            },
+            "resources": [
                 {
-                    "category": "ApplicationConsole",
-                    "enabled": true,
-                    "retentionPolicy": {
-                        "days": 30,
-                        "enabled": false
+                    "type": "Microsoft.OperationalInsights/workspaces/tables",
+                    "apiVersion": "2020-08-01",
+                    "name": "[concat(parameters('workspaceName'),'/','Heartbeat')]",
+                    "dependsOn": [
+                        "[parameters('workspaceName')]"
+                    ],
+                    "properties": {
+                        "RetentionInDays": "[parameters('heartbeatTableRetention')]"
                     }
                 }
             ]
+        },
+        { // Spring Cloud - application insights
+            "type": "Microsoft.Insights/components",
+            "name": "[parameters('appInsightsName')]",
+            "apiVersion": "[variables('appInsightsApiVersion')]",
+            "location": "[variables('location')]",
+            "tags": "[parameters('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]"
+            ],
+            "properties": {
+                "Application_Type": "web",
+                "ApplicationId": "[parameters('appInsightsName')]",
+                "Flow_Type": "Bluefield",
+                "Request_Source": "rest",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]"
+            }
+        },
+        { // Spring Cloud
+            "apiVersion": "[variables('springApiVersion')]",
+            "name": "[parameters('springCloudInstanceName')]",
+            "location": "[variables('location')]",
+            "tags": "[parameters('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]"
+            ],
+            "type": "Microsoft.AppPlatform/Spring",
+            "sku": {
+                "name": "[variables('springCloudSkuName')]",
+                "tier": "[variables('springCloudSkuTier')]"
+            },
+            "properties": {
+                "networkProfile": {
+                    "serviceCidr": "[parameters('springCloudServiceCidrs')]",
+                    "serviceRuntimeSubnetId": "[resourceId(parameters('vnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('runtimeSubnetName'))]",
+                    "appSubnetId": "[resourceId(parameters('vnetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('appSubnetName'))]"
+                }
+            }
+        },
+        { // Spring Cloud - monitoring setting
+            "apiVersion": "[variables('springApiVersion')]",
+            "name": "[concat(parameters('springCloudInstanceName'), '/default')]",
+            "type": "Microsoft.AppPlatform/Spring/monitoringSettings",
+            "properties": {
+                "traceEnabled": true,
+                "appInsightsInstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', parameters('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.AppPlatform/Spring/', parameters('springCloudInstanceName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.AppPlatform/Spring/providers/diagnosticSettings",
+            "name": "[concat(parameters('springCloudInstanceName'), '/Microsoft.Insights/monitoring')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.AppPlatform/Spring/', parameters('springCloudInstanceName'))]"
+            ],
+            "apiVersion": "[variables('diagApiVersion')]",
+            "properties": {
+                "name": "monitoring",
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces',parameters('workspaceName'))]",
+                "logs": [
+                    {
+                        "category": "ApplicationConsole",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "days": 30,
+                            "enabled": false
+                        }
+                    }
+                ]
+            }
+        },
+        { // pg network rule
+            "type": "Microsoft.DBforPostgreSQL/servers/virtualNetworkRules",
+            "apiVersion": "2017-12-01",
+            "name": "[format('{0}/{1}', parameters('dbServerName'), parameters('dbVnetRuleName'))]",
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('dbVnetName'), parameters('dbSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('dbServerName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('dbVnetName'), parameters('dbSubnetName'))]"
+            ]
+        },
+        { // pg vnet
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-06-01",
+            "name": "[parameters('dbVnetName')]",
+            "location": "[variables('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('dbVnetAddressPrefix')]"
+                    ]
+                }
+            }
+        },
+        { // pg subnet
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2020-06-01",
+            "name": "[format('{0}/{1}', parameters('dbVnetName'), parameters('dbSubnetName'))]",
+            "properties": {
+                "addressPrefix": "[parameters('dbSubnetPrefix')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('dbVnetName'))]"
+            ]
+        },
+        { // pg server
+            "type": "Microsoft.DBforPostgreSQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('dbServerName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "[parameters('skuTier')]",
+                "capacity": "[parameters('skuCapacity')]",
+                "size": "[format('{0}', parameters('skuSizeMB'))]",
+                "family": "[parameters('skuFamily')]"
+            },
+            "properties": {
+                "createMode": "Default",
+                "version": "[parameters('postgresqlVersion')]",
+                "administratorLogin": "[parameters('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "storageProfile": {
+                    "storageMB": "[parameters('skuSizeMB')]",
+                    "backupRetentionDays": "[parameters('backupRetentionDays')]",
+                    "geoRedundantBackup": "[parameters('geoRedundantBackup')]"
+                }
+            }
+        },
+        { // pg firewalls
+            "copy": {
+                "name": "firewallRules",
+                "count": "[length(variables('firewallrules'))]",
+                "mode": "serial",
+                "batchSize": 1
+            },
+            "type": "Microsoft.DBforPostgreSQL/servers/firewallRules",
+            "apiVersion": "2017-12-01",
+            "name": "[format('{0}/{1}', parameters('dbServerName'), variables('firewallrules')[copyIndex()].Name)]",
+            "properties": {
+                "startIpAddress": "[variables('firewallrules')[copyIndex()].StartIpAddress]",
+                "endIpAddress": "[variables('firewallrules')[copyIndex()].EndIpAddress]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('dbServerName'))]"
+            ]
+        },
+        {
+            // service bus
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('serviceBusNamespaceName')]",
+            "type": "Microsoft.ServiceBus/Namespaces",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {},
+            "resources": [
+                {
+                    "apiVersion": "2017-04-01",
+                    "name": "[parameters('serviceBusQueueName')]",
+                    "type": "Queues",
+                    "dependsOn": [
+                        "[concat('Microsoft.ServiceBus/namespaces/', parameters('serviceBusNamespaceName'))]"
+                    ],
+                    "properties": {
+                        "lockDuration": "PT5M",
+                        "maxSizeInMegabytes": 1024,
+                        "requiresDuplicateDetection": false,
+                        "requiresSession": false,
+                        "defaultMessageTimeToLive": "P10675199DT2H48M5.4775807S",
+                        "deadLetteringOnMessageExpiration": false,
+                        "duplicateDetectionHistoryTimeWindow": "PT10M",
+                        "maxDeliveryCount": 10,
+                        "autoDeleteOnIdle": "P10675199DT2H48M5.4775807S",
+                        "enablePartitioning": false,
+                        "enableExpress": false
+                    }
+                }
+            ]
+        },
+        {
+            "name": "nestedtemplate",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('keyVaultResourceGroupName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('dbServerName'))]",
+                "[resourceId('Microsoft.ServiceBus/Namespaces', parameters('serviceBusNamespaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.KeyVault/vaults/secrets",
+                            "name": "[concat(parameters('keyVaultName'), '/', parameters('dbServerSecretName'))]",
+                            "apiVersion": "2018-02-14",
+                            "properties": {
+                                "contentType": "Secret",
+                                "value": "[concat(parameters('dbServerName'),'.postgres.database.azure.com')]"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.KeyVault/vaults/secrets",
+                            "name": "[concat(parameters('keyVaultName'), '/', parameters('administratorLoginSecretName'))]",
+                            "apiVersion": "2018-02-14",
+                            "properties": {
+                                "contentType": "Secret",
+                                "value": "[parameters('administratorLogin')]"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.KeyVault/vaults/secrets",
+                            "name": "[concat(parameters('keyVaultName'), '/', parameters('administratorLoginPasswordSecretName'))]",
+                            "apiVersion": "2018-02-14",
+                            "properties": {
+                                "contentType": "Secret",
+                                "value": "[parameters('administratorLoginPassword')]"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.KeyVault/vaults/secrets",
+                            "name": "[concat(parameters('keyVaultName'), '/', parameters('serviceBusNamespaceConnectionSecretName'))]",
+                            "apiVersion": "2018-02-14",
+                            "properties": {
+                                "contentType": "Secret",
+                                "value": "[listkeys(variables('authRuleResourceId'), variables('sbVersion')).primaryConnectionString]"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.KeyVault/vaults/secrets",
+                            "name": "[concat(parameters('keyVaultName'), '/', parameters('serviceBusNamespacePrimaryKeySecretName'))]",
+                            "apiVersion": "2018-02-14",
+                            "properties": {
+                                "contentType": "Secret",
+                                "value": "[listkeys(variables('authRuleResourceId'), variables('sbVersion')).primaryKey]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2021-08-01",
+            "name": "[parameters('apiManagementServiceName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "[parameters('apimSku')]",
+                "capacity": "[parameters('apimSkuCount')]"
+            },
+            "properties": {
+                "publisherEmail": "[parameters('publisherEmail')]",
+                "publisherName": "[parameters('publisherName')]"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2020-09-01",
+            "name": "[parameters('clusterName')]",
+            "location": "[variables('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "Linux",
+                        "mode": "System"
+                    }
+                ],
+                "linuxProfile": {
+                    "adminUsername": "[parameters('linuxAdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                }
+            }
         }
-    }
 
 
-    // { // azure spring cloud
-    //     "name": "azureSpringCloud",
-    //     "type": "Microsoft.Resources/deployments",
-    //     "apiVersion": "2021-04-01",
-    //     "dependsOn": [
-    //         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
-    //         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
-    //         "[concat('/subscriptions/', subscription().subscriptionId ,'/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/providers/Microsoft.Authorization/roleAssignments/', variables('roleAssignmentName'))]"
-    //     ],
-    //     "properties": {
-    //         "mode": "Incremental",
-    //         "templateLink": {
-    //             //"relativePath": "artifacts/azureSpringCloud.json"
-    //              "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/azureSpringCloud.json"
-    //         },
-    //         "parameters": {
-    //             "springCloudInstanceName": {
-    //                 "value": "[parameters('springCloudInstanceName')]"
-    //             },
-    //             "appInsightsName": {
-    //                 "value": "[parameters('appInsightsName')]"
-    //             },
-    //             "springCloudServiceCidrs": {
-    //                 "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.1/16"
-    //             },
-    //             "laWorkspaceResourceId": {
-    //                 "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-    //             },
-    //             "springCloudAppSubnetID": {
-    //                 "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('appSubnetName'))]"
-    //             },
-    //             "springCloudRuntimeSubnetID": {
-    //                 "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('runtimeSubnetName'))]"
-    //             }
-    //         }
-    //     }
-    // }
-    
-    //,
-    // { // log analytics
-    //     "name": "logAnalytics",
-    //     "type": "Microsoft.Resources/deployments",
-    //     "apiVersion": "2021-04-01",
-    //     "properties": {
-    //         "mode": "Incremental",
-    //         "templateLink": {
-    //             //"relativePath": "artifacts/logAnalytics.json"
-    //             "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/logAnalytics.json"
-    //         },
-    //         "parameters": {
-    //             "workspaceName": {
-    //                 "value": "[parameters('workspaceName')]"
-    //             },
-    //             "sku": {
-    //                 "value": "pergb2018"
-    //             },
-    //             "resourcePermissions": {
-    //                 "value": true
-    //             },
-    //             "heartbeatTableRetention": {
-    //                 "value": 30
-    //             }
-    //         }
-    //     }
-    // },
-    // { // azure spring cloud
-    //     "name": "azureSpringCloud",
-    //     "type": "Microsoft.Resources/deployments",
-    //     "apiVersion": "2021-04-01",
-    //     "properties": {
-    //         "mode": "Incremental",
-    //         "templateLink": {
-    //             //"relativePath": "artifacts/azureSpringCloud.json"
-    //              "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/azureSpringCloud.json"
-    //         },
-    //         "parameters": {
-    //             "springCloudInstanceName": {
-    //                 "value": "[parameters('springCloudInstanceName')]"
-    //             },
-    //             "appInsightsName": {
-    //                 "value": "[parameters('appInsightsName')]"
-    //             },
-    //             "springCloudServiceCidrs": {
-    //                 "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.1/16"
-    //             },
-    //             "laWorkspaceResourceId": {
-    //                 "value": "[reference('logAnalytics').outputs.laWorkspaceId.value]"
-    //             },
-    //             "springCloudAppSubnetID": {
-    //                 "value": "[reference('vnet').outputs.appSubnetId.value]"
-    //             },
-    //             "springCloudRuntimeSubnetID": {
-    //                 "value": "[reference('vnet').outputs.runtimeSubnetId.value]"
-    //             }
-    //         }
-    //     }
-    // },
-    // { // mysql
-    //     "name": "mysql",
-    //     "type": "Microsoft.Resources/deployments",
-    //     "apiVersion": "2021-04-01",
-    //     "properties": {
-    //         "mode": "Incremental",
-    //         "templateLink": {
-    //             "relativePath": "artifacts/database.json"
-    //         },
-    //         "parameters": {
-    //             "serverName": {
-    //                 "value": "dbmysqldev001"
-    //             },
-    //             "administratorLogin": {
-    //                 "value": "testascdev"
-    //             },
-    //             "administratorLoginPassword": {
-    //                 "value": "Welcome1"
-    //             }
-    //         }
-    //     }
-    // }
+        // { // azure spring cloud
+        //     "name": "azureSpringCloud",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2021-04-01",
+        //     "dependsOn": [
+        //         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
+        //         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]",
+        //         "[concat('/subscriptions/', subscription().subscriptionId ,'/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName') ,'/providers/Microsoft.Authorization/roleAssignments/', variables('roleAssignmentName'))]"
+        //     ],
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             //"relativePath": "artifacts/azureSpringCloud.json"
+        //              "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/azureSpringCloud.json"
+        //         },
+        //         "parameters": {
+        //             "springCloudInstanceName": {
+        //                 "value": "[parameters('springCloudInstanceName')]"
+        //             },
+        //             "appInsightsName": {
+        //                 "value": "[parameters('appInsightsName')]"
+        //             },
+        //             "springCloudServiceCidrs": {
+        //                 "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        //             },
+        //             "laWorkspaceResourceId": {
+        //                 "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+        //             },
+        //             "springCloudAppSubnetID": {
+        //                 "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('appSubnetName'))]"
+        //             },
+        //             "springCloudRuntimeSubnetID": {
+        //                 "value": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName')), '/subnets/', parameters('runtimeSubnetName'))]"
+        //             }
+        //         }
+        //     }
+        // }
+
+        //,
+        // { // log analytics
+        //     "name": "logAnalytics",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2021-04-01",
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             //"relativePath": "artifacts/logAnalytics.json"
+        //             "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/logAnalytics.json"
+        //         },
+        //         "parameters": {
+        //             "workspaceName": {
+        //                 "value": "[parameters('workspaceName')]"
+        //             },
+        //             "sku": {
+        //                 "value": "pergb2018"
+        //             },
+        //             "resourcePermissions": {
+        //                 "value": true
+        //             },
+        //             "heartbeatTableRetention": {
+        //                 "value": 30
+        //             }
+        //         }
+        //     }
+        // },
+        // { // azure spring cloud
+        //     "name": "azureSpringCloud",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2021-04-01",
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             //"relativePath": "artifacts/azureSpringCloud.json"
+        //              "uri": "https://raw.githubusercontent.com/LyleXu/autoprovision/main/artifacts/azureSpringCloud.json"
+        //         },
+        //         "parameters": {
+        //             "springCloudInstanceName": {
+        //                 "value": "[parameters('springCloudInstanceName')]"
+        //             },
+        //             "appInsightsName": {
+        //                 "value": "[parameters('appInsightsName')]"
+        //             },
+        //             "springCloudServiceCidrs": {
+        //                 "value": "10.1.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        //             },
+        //             "laWorkspaceResourceId": {
+        //                 "value": "[reference('logAnalytics').outputs.laWorkspaceId.value]"
+        //             },
+        //             "springCloudAppSubnetID": {
+        //                 "value": "[reference('vnet').outputs.appSubnetId.value]"
+        //             },
+        //             "springCloudRuntimeSubnetID": {
+        //                 "value": "[reference('vnet').outputs.runtimeSubnetId.value]"
+        //             }
+        //         }
+        //     }
+        // },
+        // { // mysql
+        //     "name": "mysql",
+        //     "type": "Microsoft.Resources/deployments",
+        //     "apiVersion": "2021-04-01",
+        //     "properties": {
+        //         "mode": "Incremental",
+        //         "templateLink": {
+        //             "relativePath": "artifacts/database.json"
+        //         },
+        //         "parameters": {
+        //             "serverName": {
+        //                 "value": "dbmysqldev001"
+        //             },
+        //             "administratorLogin": {
+        //                 "value": "testascdev"
+        //             },
+        //             "administratorLoginPassword": {
+        //                 "value": "Welcome1"
+        //             }
+        //         }
+        //     }
+        // }
 
     ]
-    
-  }
+
+}

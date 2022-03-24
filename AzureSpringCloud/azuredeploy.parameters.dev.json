@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vnetName":{
+        "vnetName": {
             "value": "VNet1"
         },
-        "vnetResourceGroupName":{
+        "vnetResourceGroupName": {
             "value": "rg-testasc-dev"
         },
-        "runtimeSubnet": {
+        "runtimeSubnetName": {
             "value": "Subnet1"
         },
-        "appSubnet": {
+        "appSubnetName": {
             "value": "Subnet2"
         },
         "workspaceName": {
@@ -24,7 +24,7 @@
             "value": true
         },
         "heartbeatTableRetention": {
-        "value": 30
+            "value": 30
         },
         "springCloudInstanceName": {
             "value": "ascpetclinicdev1"
@@ -34,6 +34,63 @@
         },
         "springCloudServiceCidrs": {
             "value": "10.0.0.0/16,10.2.0.0/16,10.3.0.1/16"
+        },
+        "dbServerName": {
+            "value": "dbpgpetclinicdev1"
+        },
+        "administratorLogin": {
+            "value": "<user name>"
+        },
+        "administratorLoginPassword": {
+            "value": "<password>"
+        },
+        "keyVaultName": {
+            "value": "kvtestascdev"
+        },
+        "keyVaultResourceGroupName": {
+            "value": "rg-autoprovision-dev"
+        },
+        "dbServerSecretName": {
+            "value": "PG-SERVER-NAME"
+        },
+        "administratorLoginSecretName": {
+            "value": "PG-ADMIN-LOGIN"
+        },
+        "administratorLoginPasswordSecretName": {
+            "value": "PG-ADMIN-LOGIN-PASSWORD"
+        },
+        "serviceBusNamespaceName": {
+            "value": "buspetclinicdev"
+        },
+        "serviceBusQueueName": {
+            "value": "buspetclinicqueuedev"
+        },
+        "serviceBusNamespaceConnectionSecretName": {
+            "value": "BUS-PETCLINIC-NAMESPACE-CONNECTION-STRING-DEV"
+        },
+        "serviceBusNamespacePrimaryKeySecretName": {
+            "value": "BUS-PETCLINIC-NAMESPACE-PRIMARY-KEY-DEV"
+        },
+        "apiManagementServiceName": {
+            "value": "apimpetclinicdev"
+        },
+        "publisherEmail": {
+            "value": "chanxl009@hotmail.com"
+        },
+        "publisherName": {
+            "value": "Lyle"
+        },
+        "clusterName": {
+            "value": "akspetclinicdev"
+        },
+        "dnsPrefix": {
+            "value": "akspetclinic"
+        },
+        "linuxAdminUsername": {
+            "value": "<user name>"
+        },
+        "sshRSAPublicKey": {
+            "value": "<ssh public key>"
         }
     }
 }
